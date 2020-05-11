@@ -1,3 +1,16 @@
-.row {
-    padding: 0 10px;
+
+.center-panel {
+  margin-left: auto;
+  margin-right: auto;
+  width: 60rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.pad-left-right{
+  padding-left:2rem;
+  padding-right:2rem;
 }
