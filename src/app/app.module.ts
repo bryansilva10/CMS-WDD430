@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
+import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './header.component';
 import { ContactsComponent } from './contacts/contacts.component';
@@ -19,32 +19,35 @@ import { AppRoutingModule } from './app-routing.module';
 import { DocumentViewComponent } from './documents/document-view/document-view.component';
 import { DocumentEditComponent } from './documents/document-edit/document-edit.component';
 import { ContactEditComponent } from './contacts/contact-edit/contact-edit.component';
+import { DndModule } from 'ng2-dnd';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HeaderComponent,
-    ContactsComponent,
-    ContactListComponent,
-    ContactDetailComponent,
-    ContactItemComponent,
-    DocumentsComponent,
-    DocumentListComponent,
-    DocumentItemComponent,
-    DocumentDetailComponent,
-    MessageItemComponent,
-    MessageEditComponent,
-    MessageListComponent,
-    DropdownDirective,
-    DocumentViewComponent,
-    DocumentEditComponent,
-    ContactEditComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+	declarations: [
+		AppComponent,
+		HeaderComponent,
+		ContactsComponent,
+		ContactListComponent,
+		ContactDetailComponent,
+		ContactItemComponent,
+		DocumentsComponent,
+		DocumentListComponent,
+		DocumentItemComponent,
+		DocumentDetailComponent,
+		MessageItemComponent,
+		MessageEditComponent,
+		MessageListComponent,
+		DropdownDirective,
+		DocumentViewComponent,
+		DocumentEditComponent,
+		ContactEditComponent
+	],
+	imports: [
+		BrowserModule,
+		FormsModule,
+		AppRoutingModule,
+		DndModule.forRoot()
+	],
+	providers: [],
+	bootstrap: [AppComponent]
 })
 export class AppModule { }
