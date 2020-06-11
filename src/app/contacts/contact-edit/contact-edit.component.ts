@@ -55,10 +55,13 @@ export class ContactEditComponent implements OnInit {
 				if (this.contact.group !== null && this.contact.group !== undefined) {
 					//set has group to true
 					this.hasGroup = true;
-					//make a clone of the original contact group property by sstoring into conntact
-					this.contact = JSON.parse(JSON.stringify(this.originalContact.group));
-					//make a clone of that contact group property and store into group ccontacts prop
-					this.groupContacts = this.contact.group.slice();
+					// //make a clone of the original contact group property by sstoring into conntact
+					// this.contact = JSON.parse(JSON.stringify(this.originalContact.group));
+					// //make a clone of that contact group property and store into group ccontacts prop
+					// this.groupContacts = this.contact.group.slice();
+
+					//the approach above didn't work so I used spread to make a copy
+					this.groupContacts = [...this.contact.group];
 				}
 			}
 		)
