@@ -12,7 +12,7 @@ export class MessageItemComponent implements OnInit {
   @Input() message: Message;
 
   //variable for sender
-  messageSender: string = "";
+  messageSender: string;
 
   //inject contact service
   constructor(private contactService: ContactService) { }
@@ -20,9 +20,9 @@ export class MessageItemComponent implements OnInit {
   ngOnInit() {
     //get single contact
     let contact: Contact = this.contactService.getContact(this.message.sender);
-    console.log('this is ' + contact);
+    //console.log('this is ' + contact);
     //assign name of contact to message sender
-    this.messageSender = contact.name;
+    this.messageSender = contact ? contact.name : 'Contact not found';
   }
 
 }

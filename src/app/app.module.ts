@@ -21,35 +21,37 @@ import { DocumentEditComponent } from './documents/document-edit/document-edit.c
 import { ContactEditComponent } from './contacts/contact-edit/contact-edit.component';
 import { DndModule } from 'ng2-dnd';
 import { ContactsFilterPipe } from './contacts/contacts-filter.pipe';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
-	declarations: [
-		AppComponent,
-		HeaderComponent,
-		ContactsComponent,
-		ContactListComponent,
-		ContactDetailComponent,
-		ContactItemComponent,
-		DocumentsComponent,
-		DocumentListComponent,
-		DocumentItemComponent,
-		DocumentDetailComponent,
-		MessageItemComponent,
-		MessageEditComponent,
-		MessageListComponent,
-		DropdownDirective,
-		DocumentViewComponent,
-		DocumentEditComponent,
-		ContactEditComponent,
-		ContactsFilterPipe
-	],
-	imports: [
-		BrowserModule,
-		FormsModule,
-		AppRoutingModule,
-		DndModule.forRoot()
-	],
-	providers: [],
-	bootstrap: [AppComponent]
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    ContactsComponent,
+    ContactListComponent,
+    ContactDetailComponent,
+    ContactItemComponent,
+    DocumentsComponent,
+    DocumentListComponent,
+    DocumentItemComponent,
+    DocumentDetailComponent,
+    MessageItemComponent,
+    MessageEditComponent,
+    MessageListComponent,
+    DropdownDirective,
+    DocumentViewComponent,
+    DocumentEditComponent,
+    ContactEditComponent,
+    ContactsFilterPipe
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpClientModule,
+    AppRoutingModule,
+    DndModule.forRoot()
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
