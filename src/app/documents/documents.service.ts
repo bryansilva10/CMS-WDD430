@@ -32,7 +32,7 @@ export class DocumentsService {
     // return this.documents.slice();
 
     //use http get
-    this.http.get('https://cms-app-d5fce.firebaseio.com/documents.json')
+    this.http.get('https://localhost:3000/documents')
       //subscribe to observable returning
       .subscribe(
         //sucess function
@@ -81,63 +81,90 @@ export class DocumentsService {
   }
 
   //method to add a document when user press add button
-  addDocument(newDocument: Document) {
-    //if null or undef...
-    if (newDocument === null || newDocument === undefined) {
-      //exit function
+  addDocument(document: Document) {
+    //check if document is defined
+    if (!document) {
+      //if so, exit function
       return;
     }
 
-    //if document exists..
-    //increment id number and assign to new document (as string)
-    this.maxDocumentId++;
-    newDocument.id = this.maxDocumentId.toString();
-    //push unto list
-    this.documents.push(newDocument);
-    //store documents on firebase database
-    this.storeDocuments();
+    //create header
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    //convert object to string to send on request
+    document.id = '';
+    const strDocument = JSON.stringify(document);
+
+    //send post request with document and header
+    this.http.post('http://localhost:3000/documents', strDocument, { headers: headers })
+      //subscribe to response
+      .subscribe(
+        (documents: Document[]) => {
+          //assign document list
+          this.documents = documents;
+          //emit the change
+          this.documentListChangedEvent.next(this.documents.slice());
+        });
   }
 
   //method to update/replace an existing document
   updateDocument(originalDocument: Document, newDocument: Document) {
-    //check if document exists...
-    if (originalDocument === null || originalDocument === undefined || newDocument === null || newDocument === undefined) {
-      //if not, exit function
+    //check if documents are undefined
+    if (!originalDocument || !newDocument) {
+      //if so, exit
       return;
     }
 
-    //find position/index of original document
+    //get position of original document
     const pos = this.documents.indexOf(originalDocument);
-    //if the position is less than 0 (meaning it is not in the list)...
+    //if the position is not in the array
     if (pos < 0) {
       //exit
       return;
     }
 
-    //set the id of new document to be tht of the original
-    newDocument.id = originalDocument.id;
-    //set the document in the list to be the new document
-    this.documents[pos] = newDocument;
-    //store documents on firebase database
-    this.storeDocuments();
+    //set headers
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    //convert document object to string
+    const strDocument = JSON.stringify(newDocument);
+
+    //send patch request with original document id, new document object and headers
+    this.http.patch('http://localhost:3000/documents/' + originalDocument.id
+      , strDocument
+      , { headers: headers })
+      //subscribe to response
+      .subscribe(
+        (documents: Document[]) => {
+          //assign updated document list
+          this.documents = documents;
+          //emit change
+          this.documentListChangedEvent.next(this.documents.slice());
+        });
   }
 
+  //method to delete a document via request to server
   deleteDocument(document: Document) {
-    //check if an existent document was passed
+    //check if documents are undefined
     if (document === null || document === undefined) {
+      //exit
       return;
     }
-    //get position of document on list
-    const pos = this.documents.indexOf(document);
 
-    //if there is no document (index less than 0), exit.
-    if (pos < 0) {
-      return;
-    }
-    //removed document at specified position
-    this.documents.splice(pos, 1);
-    //store/modify documents on firebase database
-    this.storeDocuments();
+    //send request to delete using document id in params
+    this.http.delete('http://localhost:3000/documents/' + document.id)
+      //subscribe to response
+      .subscribe(
+        (documents: Document[]) => {
+          //assign modified document list
+          this.documents = documents;
+          //emit changes
+          this.documentListChangedEvent.next(this.documents.slice());
+        });
   }
 
   //method to store documents in database with put request
