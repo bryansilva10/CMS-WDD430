@@ -21,9 +21,9 @@ export class DocumentsService {
   constructor(private http: HttpClient) {
     //init documents to be the ones coming from mock
     // this.documents = MOCKDOCUMENTS;
-    this.getDocuments();
+    // this.getDocuments();
     //get the max id at init time
-    this.maxDocumentId = this.getMaxId();
+    // this.maxDocumentId = this.getMaxId();
   }
 
   //method to get all documents
@@ -32,18 +32,16 @@ export class DocumentsService {
     // return this.documents.slice();
 
     //use http get
-    this.http.get('https://localhost:3000/documents')
+    this.http.get<{ message: string, documents: Document[] }>('http://localhost:3000/documents')
       //subscribe to observable returning
       .subscribe(
         //sucess function
-        (documents: Document[]) => {
+        (documentData) => {
           //assign the array of documents received to the documents class attribute
-          this.documents = documents;
-          // get the maximum value used for the id property in the documents list
-          this.maxDocumentId = this.getMaxId();
+          this.documents = documentData.documents;
           //sort alphabetically by name
           this.documents.sort((a, b) => (a.name < b.name) ? 1 : (a.name > b.name) ? -1 : 0)
-          //signal that the list has changed
+          // signal that the list has changed
           this.documentListChangedEvent.next(this.documents.slice());
         },
         (error: any) => {
@@ -168,23 +166,23 @@ export class DocumentsService {
   }
 
   //method to store documents in database with put request
-  storeDocuments() {
-    //stringify the list of documnts
-    let documents = JSON.stringify(this.documents);
+  // storeDocuments() {
+  //   //stringify the list of documnts
+  //   let documents = JSON.stringify(this.documents);
 
-    //create header for content type
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
+  //   //create header for content type
+  //   const headers = new HttpHeaders({
+  //     'Content-Type': 'application/json'
+  //   });
 
-    //put method with url, documents object to replace, and headers
-    this.http.put('https://cms-app-d5fce.firebaseio.com/documents.json', documents, { headers: headers })
-      //subscribe to response
-      .subscribe(
-        () => {
-          //once a response has been received, signal that the document list has changed, send copy of list
-          this.documentListChangedEvent.next(this.documents.slice());
-        }
-      )
-  }
+  //   //put method with url, documents object to replace, and headers
+  //   this.http.put('https://cms-app-d5fce.firebaseio.com/documents.json', documents, { headers: headers })
+  //     //subscribe to response
+  //     .subscribe(
+  //       () => {
+  //         //once a response has been received, signal that the document list has changed, send copy of list
+  //         this.documentListChangedEvent.next(this.documents.slice());
+  //       }
+  //     )
+  // }
 }

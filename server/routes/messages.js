@@ -18,6 +18,7 @@ function returnError(res, error) {
 router.get('/', (req, res, next) => {
   //retrieve all messages using model
   Message.find()
+    .populate('sender')
     .then(messages => {
       //return successful response
       res.status(200).json({

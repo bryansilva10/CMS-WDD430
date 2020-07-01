@@ -23,7 +23,7 @@ export class ContactService {
   constructor(private http: HttpClient) {
     //init contact to be the ones coming from mockcontaccts
     // this.contacts = MOCKCONTACTS;
-    this.getContacts();
+    // this.getContacts();
     //get the max id at init time
     this.maxContactId = this.getMaxId();
   }
@@ -31,15 +31,13 @@ export class ContactService {
   //method to get all contaccts
   getContacts() {
     //use http get
-    this.http.get('https://cms-app-d5fce.firebaseio.com/contacts.json')
+    this.http.get<{ message: string, contacts: Contact[] }>('http://localhost:3000/contacts')
       //subscribe to observable returning
       .subscribe(
         //sucess function
-        (contacts: Contact[]) => {
+        (responseData) => {
           //assign the array of contacts received to the contacts class attribute
-          this.contacts = contacts;
-          // get the maximum value used for the id property in the contacts list
-          this.maxContactId = this.getMaxId();
+          this.contacts = responseData.contacts;
           //sort alphabetically by name
           this.contacts.sort((a, b) => (a.name < b.name) ? 1 : (a.name > b.name) ? -1 : 0)
           //signal that the list has changed
@@ -91,83 +89,109 @@ export class ContactService {
 
   //method to add a contact when user press add button
   addContact(newContact: Contact) {
-    //if null or undef...
-    if (newContact === null || newContact === undefined) {
-      //exit function
+    ////check if contact is defined
+    if (!newContact) {
+      //exit
       return;
     }
 
-    //if contact exists..
-    //increment id number and assign to new contact (as string)
-    this.maxContactId++;
-    newContact.id = this.maxContactId.toString();
-    //push unto list
-    this.contacts.push(newContact);
-    //store/modify contacts on firebase database
-    this.storeContacts();
+    //set headers
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    //convert object to string to send in req
+    newContact.id = '';
+    const strContact = JSON.stringify(newContact);
+
+    //send req with object and headers
+    this.http.post('http://localhost:3000/contacts', strContact, { headers: headers })
+      //subscribe to response
+      .subscribe(
+        (contacts: Contact[]) => {
+          //assign contact list
+          this.contacts = contacts;
+          //emit changes
+          this.contactChangedEvent.next(this.contacts.slice());
+        });
   }
 
   //method to update/replace an existing contact
   updateContact(originalContact: Contact, newContact: Contact) {
-    //check if contact exists...
-    if (originalContact === null || originalContact === undefined || newContact === null || newContact === undefined) {
-      //if not, exit function
+    //check if contact or update is defined
+    if (!originalContact || !newContact) {
+      //exit
       return;
     }
 
-    //find position/index of original cntact
+    //geet position in list of contacts
     const pos = this.contacts.indexOf(originalContact);
-    //if the position is less than 0 (meaning it is not in the list)...
+    //if position is not in array
     if (pos < 0) {
       //exit
       return;
     }
 
-    //set the id of new contact to be tht of the original
-    newContact.id = originalContact.id;
-    //set the contact in the list to be the new contact
-    this.contacts[pos] = newContact;
-    //store/modify contacts on firebase database
-    this.storeContacts();
-  }
-
-  //method to delete a contact
-  deleteContact(contact: Contact) {
-    //check if an existent document was passed
-    if (contact === null || contact === undefined) {
-      return;
-    }
-    //get position of document on list
-    const pos = this.contacts.indexOf(contact);
-
-    //if there is no document (index less than 0), exit.
-    if (pos < 0) {
-      return;
-    }
-    //removed document at specified position
-    this.contacts.splice(pos, 1);
-    //store/modify contacts on firebase database
-    this.storeContacts();
-  }
-
-  //method to store contacts in database with put request
-  storeContacts() {
-    //stringify the list of documnts
-    let contacts = JSON.stringify(this.contacts);
-
-    //create header for content type
+    //set headers
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
 
-    //put method with url, contacts object to replace, and headers
-    this.http.put('https://cms-app-d5fce.firebaseio.com/contacts.json', contacts, { headers: headers })
+    //conver object to string to send in req
+    const strContact = JSON.stringify(newContact);
+
+    //send req with contact id, object and headers
+    this.http.patch('http://localhost:3000/contacts/' + originalContact.id
+      , strContact
+      , { headers: headers })
       //subscribe to response
       .subscribe(
-        () => {
-          //once a response has been received, signal that the document list has changed, send copy of list
-          this.contactListChangedEvent.next(this.contacts.slice());
-        }
-      )
+        (contacts: Contact[]) => {
+          //assign contacts list
+          this.contacts = contacts;
+          //emit changes
+          this.contactChangedEvent.next(this.contacts.slice());
+        });
   }
+
+  //method to delete a contact
+  deleteContact(contact: Contact) {
+    //check if contact is undefined
+    if (!contact) {
+      //exit
+      return;
+    }
+
+    //send request with specific id
+    this.http.delete('http://localhost:3000/contacts/' + contact.id)
+      //subscribe to response
+      .subscribe(
+        (contacts: Contact[]) => {
+          //assing list of contacts
+          this.contacts = contacts;
+          //emit changes
+          this.contactChangedEvent.next(this.contacts.slice());
+        });
+  }
+
+  //method to store contacts in database with put request
+  // storeContacts() {
+  //   //stringify the list of documnts
+  //   let contacts = JSON.stringify(this.contacts);
+
+  //   //create header for content type
+  //   const headers = new HttpHeaders({
+  //     'Content-Type': 'application/json'
+  //   });
+
+  //   //put method with url, contacts object to replace, and headers
+  //   this.http.put('https://cms-app-d5fce.firebaseio.com/contacts.json', contacts, { headers: headers })
+  //     //subscribe to response
+  //     .subscribe(
+  //       () => {
+  //         //once a response has been received, signal that the document list has changed, send copy of list
+  //         this.contactListChangedEvent.next(this.contacts.slice());
+  //       }
+  //     )
+  // }
 }

@@ -18,22 +18,20 @@ export class MessagesService {
 
   //inject http client
   constructor(private http: HttpClient) {
-    this.getMessages();
+    // this.getMessages();
 
   }
 
   //method to get all messages
   getMessages() {
     //use http get
-    this.http.get('https://cms-app-d5fce.firebaseio.com/messages.json')
+    this.http.get<{ message: string, messages: Message[] }>('http://localhost:3000/messages')
       //subscribe to observable returning
       .subscribe(
         //sucess function
-        (messages: Message[]) => {
+        (messagesData) => {
           //assign the array of contacts received to the contacts class attribute
-          this.messages = messages;
-          // get the maximum value used for the id property in the contacts list
-          this.maxMessageId = this.getMaxId();
+          this.messages = messagesData.messages;
           //sort alphabetically by name
           this.messages.sort((a, b) => (a.id < b.id) ? 1 : (a.id > b.id) ? -1 : 0)
           //signal that the list has changed
@@ -75,30 +73,32 @@ export class MessagesService {
   }
 
   //method to add a message
-  addMessage(message: Message) {
-    this.messages.push(message);
-    this.storeMessages();
-  }
+  addMessage(newMessage: Message) {
+    //check if message is defined
+    if (!newMessage) {
+      //exit
+      return;
+    }
 
-  //method to store messages in database with put request
-  storeMessages() {
-    //stringify the list of documnts
-    let messages = JSON.stringify(this.messages);
-
-    //create header for content type
+    //set headers
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
 
-    //put method with url, messages object to replace, and headers
-    this.http.put('https://cms-app-d5fce.firebaseio.com/messages.json', messages, { headers: headers })
+    //convert object to string to send on request
+    newMessage.id = '';
+    const strMessage = JSON.stringify(newMessage);
+
+    //send request with object and headers
+    this.http.post('http://localhost:3000/messages', strMessage, { headers: headers })
       //subscribe to response
       .subscribe(
-        () => {
-          //once a response has been received, signal that the document list has changed, send copy of list
+        (messages: Message[]) => {
+          //assign messages list
+          this.messages = messages;
+          //emit change
           this.messageListChangedEvent.next(this.messages.slice());
-        }
-      )
+        });
   }
 }
 

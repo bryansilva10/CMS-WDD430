@@ -2,6 +2,7 @@
 
 const express = require('express'); //import express
 const router = express.Router(); //import the router
+const sequenceGenerator = require('./sequenceGenerator'); //import sequence gen
 
 const Document = require('../models/document'); //import document model
 
