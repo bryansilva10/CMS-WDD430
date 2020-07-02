@@ -50,7 +50,7 @@ export class ContactService {
   }
 
   //method to get a single specific contact
-  getContact(id: string): Contact {
+  getContact(id: string) {
     // //loop through all the contacts
     // this.contacts.forEach(contact => {
     //   //if ids match
@@ -61,12 +61,14 @@ export class ContactService {
     // //if no id is found...
     // return null;
 
-    for (const contact of this.contacts) {
-      if (contact.id === id) {
-        return contact;
-      }
-    }
-    return null;
+    // for (const contact of this.contacts) {
+    //   if (contact.id === id) {
+    //     return contact;
+    //   }
+    // }
+    // return null;
+
+    return this.http.get<{ message: string, contact: Contact }>('http://localhost:3000/contacts/' + id);
   }
 
   //method to get max id number in contact list

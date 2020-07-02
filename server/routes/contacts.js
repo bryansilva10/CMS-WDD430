@@ -33,6 +33,26 @@ router.get('/', (req, res, next) => {
 }
 );
 
+//GET route to get a single contact by id
+router.get('/:id', (req, res, next) => {
+  //find specific contact
+  Contact.findOne({
+    //retrieve id from params
+    "id": req.params.id
+  })
+    //populate
+    .populate('group')
+    .then(contact => {
+      res.status(200).json({
+        message: 'Contact fetched successfully',
+        contact: contact
+      });
+    })
+    .catch(error => {
+      returnError(res, error);
+    })
+})
+
 //POST route for adding contact
 router.post('/', (req, res, next) => {
   //get unique id for adding new contact
